@@ -12,6 +12,19 @@ abstract class AbstractKoma {
     this.team = team;
     this.kStat = new KomaStatus(active);
   }
+  
+  
+  void captured() {
+    this.kStat.captured=true;
+    this.team = (this.team+1)%2;
+    this.y = board.mArea[this.team].getBlankYIndex();
+    this.x = board.mArea[this.team].posX;
+  }
+  
+  void moveAndCapture(AbstractKoma enemy, int toX, int toY) {
+    this.updatePos(toX, toY);
+    if (enemy!=null) enemy.captured();
+  }
 
   void draw() {
     String komaImage = "";
@@ -30,11 +43,14 @@ abstract class AbstractKoma {
     rect(this.x*SQUARESIZE, this.y*SQUARESIZE, SQUARESIZE, SQUARESIZE);
   }
     void move(int toX, int toY) {
-    this.updatePos(toX, toY);
+        AbstractKoma koma = komaList.getKomaFromPlace(toX, toY);
+    if (koma==null) this.updatePos(toX, toY);
+    else if (koma.team != gs.turn) this.moveAndCapture(koma, toX, toY);
   }
   void updatePos(int toX, int toY) {
     this.x=toX;
     this.y=toY;
+    this.kStat.captured=false;
     gs.turn = (gs.turn+1)%2;
   }
 }
